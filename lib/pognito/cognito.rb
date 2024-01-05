@@ -86,8 +86,6 @@ module Pognito
       end
 
       def unset_tokens
-        @current_user = nil
-
         @storage.delete(:access_token)
         @storage.delete(:refresh_token)
       end
