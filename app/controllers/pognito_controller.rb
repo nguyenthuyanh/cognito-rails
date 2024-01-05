@@ -2,9 +2,7 @@ class PognitoController < ApplicationController
   include PognitoConcern
 
   def login
-    if params[:code]
-      pognito.tokens(params[:code]); return redirect_to_after_sign_in
-    end
+    pognito.tokens(params[:code]); return redirect_to_after_sign_in if params[:code]
 
     return redirect_to_sign_in unless pognito.tokens?
 
