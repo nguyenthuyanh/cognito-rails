@@ -5,8 +5,8 @@ Rails.application.routes.draw do
   # root "articles#index"
 
   root "index#index"
-  get "/logout", to: "index#logout"
-  get "/login", to: "index#login"
+  get "/logout", to: "pognito#logout"
+  get "/login", to: "pognito#login"
   get "/user", to: "index#user"
 end
 

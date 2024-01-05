@@ -39,11 +39,15 @@ module Pognito
       }.merge(user.user_attributes.map { |attr| [attr.name, attr.value] }.to_h.symbolize_keys)
     end
 
-    def set_tokens(code)
-      tokens = tokens_from_code(code)
+    def tokens(code)
+      unless tokens?
+        new_tokens = tokens_from_code(code)
 
-      @storage[:access_token] = tokens["access_token"]
-      @storage[:refresh_token] = tokens["refresh_token"]
+        @storage[:access_token] = new_tokens["access_token"]
+        @storage[:refresh_token] = new_tokens["refresh_token"]
+      end
+
+      { access_token:, refresh_token: }
     end
 
     def sign_in_url
@@ -74,6 +78,16 @@ module Pognito
 
     def tokens?
       access_token && refresh_token
+    end
+
+    def redirect_to_after_sign_in(url = nil)
+      @storage[:redirect_to] = url if url
+
+      @storage[:redirect_to]
+    end
+
+    def clear_redirect_to_after_sign_in
+      @storage.delete(:redirect_to)
     end
 
     private
