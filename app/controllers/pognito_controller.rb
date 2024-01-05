@@ -17,10 +17,12 @@ class PognitoController < ApplicationController
     redirect_to_sign_out
   end
 
-  def redirect_to_after_sign_in
-    url = pognito.redirect_to_after_sign_in
-    pognito.clear_redirect_to_after_sign_in
+  private
 
-    redirect_to url || root_path, allow_other_host: true
-  end
+    def redirect_to_after_sign_in
+      url = pognito.redirect_to_after_sign_in
+      pognito.clear_redirect_to_after_sign_in
+
+      redirect_to url || root_path, allow_other_host: true
+    end
 end
