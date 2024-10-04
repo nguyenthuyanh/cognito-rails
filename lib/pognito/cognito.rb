@@ -23,6 +23,8 @@ module Pognito
 
     def user
       begin
+        refresh_access_token
+
         user = @client.get_user({access_token: access_token}) if access_token
       rescue Aws::CognitoIdentityProvider::Errors::NotAuthorizedException
         user = nil
@@ -91,12 +93,22 @@ module Pognito
     end
 
     private
+      def refresh_access_token
+        new_tokens = tokens_from_refresh_token(refresh_token)
+
+        @storage[:access_token] = new_tokens["access_token"]
+
+        { access_token: }
+      end
+
       def scope(*args)
         args.join('+')
       end
 
       def encoded_client_credentials
-        Base64.strict_encode64("#{ENV['AWS_COGNITO_APP_CLIENT_ID']}:#{ENV['AWS_COGNITO_APP_CLIENT_SECRET']}")
+        Base64.strict_encode64(
+          "#{ENV['AWS_COGNITO_APP_CLIENT_ID']}:#{ENV['AWS_COGNITO_APP_CLIENT_SECRET']}"
+        )
       end
 
       def unset_tokens
@@ -113,17 +125,29 @@ module Pognito
       end
 
       def tokens_from_code(code)
+        tokens_from(code)
+      end
+
+      def tokens_from_refresh_token(refresh_token)
+        tokens_from(refresh_token, grant_type: "refresh_token")
+      end
+
+      def tokens_from(value, grant_type: "code")
+        type = grant_type === "code" ? "authorization_code" : "refresh_token"
+        type_key = grant_type === "code" ? "code" : "refresh_token"
+
         headers = {
           Authorization: "Basic #{encoded_client_credentials}",
           "Content-Type": "application/x-www-form-urlencoded"
         }
 
         body = {
-          grant_type: "authorization_code",
+          grant_type: type,
           client_id: ENV['AWS_COGNITO_APP_CLIENT_ID'],
-          code: code,
           redirect_uri: "#{ENV['AWS_COGNITO_REDIRECT_URI']}/login"
         }
+
+        body[type_key] = value
 
         url = "https://#{ENV['AWS_COGNITO_DOMAIN']}/oauth2/token"
 
