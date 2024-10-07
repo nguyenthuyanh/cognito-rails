@@ -1,0 +1,11 @@
+inherit_from:
+  - ./rubocop/config/default.yml
+  - .rubocop_todo.yml
+
+require:
+  - rubocop-rails
+  - rubocop-performance
+  - rubocop-rspec
+
+AllCops:
+  CacheRootDirectory: tmp/rubocop

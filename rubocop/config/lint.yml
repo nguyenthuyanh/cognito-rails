@@ -1,0 +1,7 @@
+Lint/AmbiguousBlockAssociation:
+  Exclude:
+    - spec/**/*
+
+Lint/MissingSuper:
+  Description: Checks for the presence of constructors and lifecycle callbacks without calls to `super`.
+  Enabled: false

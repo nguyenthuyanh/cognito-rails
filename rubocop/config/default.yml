@@ -1,0 +1,29 @@
+##############
+# Global rules
+
+AllCops:
+  RSpec:
+    Patterns:
+      - _spec.rb
+      - "(?:^|/)spec/"
+  RSpec/FactoryBot:
+    Patterns:
+      - spec/factories/**/*.rb
+  Exclude:
+    - 'bin/**/*'
+    - 'db/**/*'
+    - 'config/**/*'
+    - 'log/**/*'
+    - 'node_modules/**/*'
+    - 'tmp/**/*'
+    - 'test/**/*'
+    - 'app/services/migrate_platforms/**/*'
+    - !ruby/regexp /old_and_unused\.rb$/
+
+inherit_from:
+  - "./layout.yml"
+  - "./lint.yml"
+  - "./metrics.yml"
+  - "./rails.yml"
+  - "./rspec.yml"
+  - "./style.yml"
