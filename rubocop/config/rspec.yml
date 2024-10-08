@@ -16,18 +16,13 @@ RSpec/ExampleLength:
   Description: Checks if the length of a test exceeds some maximum value
   Enabled: true
   Max: 10
-  CountAsOne: ['array', 'hash', 'heredoc', 'method_call']
+  CountAsOne: ["array", "hash", "heredoc", "method_call"]
 
 RSpec/MultipleMemoizedHelpers:
   Description: Checks if example groups contain too many `let` and `subject` calls.
   Enabled: true
   AllowSubject: true
   Max: 7
-
-RSpec/FilePath:
-  Description: Checks that spec file paths are consistent and well-formed.
-  Enabled: true
-  SpecSuffixOnly: true
 
 RSpec/ContextWording:
   Description: Checks that `context` docstring starts with an allowed prefix.
