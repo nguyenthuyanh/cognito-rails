@@ -53,6 +53,8 @@ gem 'aws-sdk-cognitoidentityprovider'
 gem 'httparty'
 
 gem 'redis-actionpack'
+gem "hubspot-api-client"
+gem "tailwindcss-rails"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

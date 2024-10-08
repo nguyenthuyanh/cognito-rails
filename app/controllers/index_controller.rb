@@ -1,13 +1,11 @@
 class IndexController < ApplicationController
-  include PognitoConcern
+  skip_before_action :restrict_access, only: [:index]
 
-  before_action :restrict_access, only: [:user]
-
-  def index
-    render locals: { current_user: }
-  end
+  def index; end
 
   def user
-    render locals: { current_user: }
+    crm = Crm::Hubspot.new(user_id: current_user[:sub])
+
+    @document = crm.get_document
   end
 end
