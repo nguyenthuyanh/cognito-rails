@@ -4,7 +4,7 @@ class IndexController < ApplicationController
   def index; end
 
   def user
-    user = Crm::Hubspot.new(user_id: current_user[:sub])
+    user = Crm::Hubspot.new
 
     @document = user.document
   end

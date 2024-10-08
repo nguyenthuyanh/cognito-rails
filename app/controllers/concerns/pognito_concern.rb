@@ -17,17 +17,11 @@ module PognitoConcern
       redirect_to pognito.sign_out_url, allow_other_host: true
     end
 
-    def redirect_to_root
-      redirect_to root_path, allow_other_host: true
-    end
-
     def current_user
       @current_user ||= pognito.user
     end
 
     def restrict_access
-      return redirect_to_sign_in unless pognito.tokens?
-
-      redirect_to_root unless current_user
+      redirect_to_sign_in unless pognito.tokens? && current_user
     end
 end

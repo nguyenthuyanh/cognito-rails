@@ -1,7 +1,8 @@
 class PognitoController < ApplicationController
   skip_before_action :restrict_access
   def login
-    pognito.tokens(params[:code]); return redirect_to_after_sign_in if params[:code]
+    pognito.tokens(params[:code])
+    return redirect_to_after_sign_in if params[:code]
 
     return redirect_to_sign_in unless pognito.tokens?
 
@@ -15,11 +16,10 @@ class PognitoController < ApplicationController
   end
 
   private
-
     def redirect_to_after_sign_in
       url = pognito.redirect_to_after_sign_in
       pognito.clear_redirect_to_after_sign_in
 
-      redirect_to url || root_path, allow_other_host: true
+      redirect_to url || root_path
     end
 end
