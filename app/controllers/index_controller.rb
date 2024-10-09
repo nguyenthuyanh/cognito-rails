@@ -1,6 +1,8 @@
 class IndexController < ApplicationController
   skip_before_action :restrict_access, only: [:index]
+  skip_before_action :restrict_access, only: [:index]
 
+  def index; end
   def index; end
 
   def user
