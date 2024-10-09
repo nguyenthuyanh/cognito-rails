@@ -1,0 +1,30 @@
+Metrics/BlockLength:
+  Exclude:
+    - config/**/*
+    - spec/**/*
+Metrics/MethodLength:
+  Description: Checks if the length of a method exceeds some maximum value
+  Enabled: true
+  Max: 20
+  CountAsOne: ['array', 'hash', 'heredoc', 'method_call']
+
+Metrics/ClassLength:
+  Description: Checks if the length of a class exceeds some maximum value
+  Enabled: true
+  CountAsOne: ['array', 'hash', 'heredoc', 'method_call']
+
+Metrics/AbcSize:
+  Description: Checks that the ABC size of methods is not higher than the configured maximum
+  Enabled: true
+  CountRepeatedAttributes: false
+  Max: 30 # "<= 17" satisfactory, "18..30" unsatisfactory, "> 30" dangerous
+
+Metrics/CyclomaticComplexity:
+  Description: Checks that the cyclomatic complexity of methods is not higher than the configured maximum.
+  Enabled: true
+  Max: 10
+
+Metrics/PerceivedComplexity:
+  Description: Checks the complexity the reader experiences when looking at a method.
+  Enabled: true
+  Max: 10

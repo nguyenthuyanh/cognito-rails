@@ -22,7 +22,7 @@ module PognitoConcern
     end
 
     def current_user
-      pognito.user
+      @current_user ||= pognito.user
     end
 
     def restrict_access

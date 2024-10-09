@@ -1,6 +1,5 @@
 class PognitoController < ApplicationController
-  include PognitoConcern
-
+  skip_before_action :restrict_access
   def login
     pognito.tokens(params[:code]); return redirect_to_after_sign_in if params[:code]
 

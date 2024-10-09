@@ -1,0 +1,65 @@
+Layout/EmptyLinesAroundAccessModifier:
+  Description: Access modifiers should be surrounded by blank lines.
+  Enabled: true
+  EnforcedStyle: only_before
+
+Layout/IndentationConsistency:
+  Description: Keep indentation straight.
+  Enabled: true
+  EnforcedStyle: indented_internal_methods
+
+Layout/LineLength:
+  Max: 120
+
+Layout/MultilineMethodCallIndentation:
+  Description: Use 2 spaces for indenting an expression spanning multiple lines.
+  Enabled: true
+  EnforcedStyle: indented
+
+Layout/MultilineAssignmentLayout:
+  Description: The multiline assignments have a newline after the assignment operator
+  Enabled: true
+  EnforcedStyle: same_line
+
+Layout/EndAlignment:
+  Description: the end keywords are aligned properly
+  Enabled: true
+  EnforcedStyleAlignWith: variable
+
+Layout/SpaceAroundEqualsInParameterDefault:
+  Description: Checks that the equals signs in parameter default assignments don't have surrounding space depending on configuration.
+  Enabled: true
+  EnforcedStyle: no_space
+
+Layout/SpaceInLambdaLiteral:
+  Description: Require space between -> and opening parameter parenthesis (() in lambda literals.
+  Enabled: true
+  EnforcedStyle: require_space
+
+Layout/ArgumentAlignment:
+  Description: Check if the arguments on a multi-line method definition are aligned.
+  Enabled: true
+  EnforcedStyle: with_fixed_indentation
+
+Layout/CaseIndentation:
+  Description: Indent when as deep as case.
+  Enabled: false
+
+Layout/MultilineOperationIndentation:
+  Description: Align the operands of an expression in an assignment spanning multiple lines.
+  Enabled: true
+  EnforcedStyle: indented
+
+Layout/ArrayAlignment:
+  Description: Align the elements of an array literal if they span more than one line.
+  Enabled: false
+
+Layout/ElseAlignment:
+  Description: Align the elements of an array literal if they span more than one line.
+  Enabled: false
+
+Layout/FirstHashElementIndentation:
+  Description: "The first key in a hash literal where the opening brace and the first key are on separate lines
+    is indented the same as a hash literal which is not defined inside a method call."
+  Enabled: true
+  EnforcedStyle: consistent

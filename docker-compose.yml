@@ -1,6 +1,6 @@
 version: '3'
 services:
-  app:
+  app: &app_base
     tty: true
     stdin_open: true
     build:
@@ -30,3 +30,10 @@ services:
     image: redis
     ports:
       - 6379:6379
+
+  tailwind:
+    <<: *app_base
+    command: bundle exec rails tailwindcss:watch
+    ports: []
+    depends_on:
+      - app

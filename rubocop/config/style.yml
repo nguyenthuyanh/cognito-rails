@@ -1,0 +1,51 @@
+Style/Documentation:
+  Enabled: false
+
+Style/StringLiterals:
+  Description: Prefer double-quoted strings unless you need single quotes to avoid extra backslashes for escaping.
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+Style/StringLiteralsInInterpolation:
+  Description: Prefer double-quoted strings inside the string interpolation.
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+Style/SymbolArray:
+  Description: Check for array literals made up of symbols that are not using the brackets syntax.
+  Enabled: true
+  EnforcedStyle: brackets
+
+Style/WordArray:
+  Description: Check for array literals made up of word-like strings, that are not using the %w() syntax.
+  Enabled: true
+  MinSize: 3
+
+Style/RegexpLiteral:
+  Description: This cop enforces using // or %r around regular expressions.
+  Enabled: true
+  EnforcedStyle: slashes
+  AllowInnerSlashes: true
+
+Style/FrozenStringLiteralComment:
+  Description: Transition from mutable string literals to frozen string literals.
+  Enabled: false
+
+Style/RedundantSelf:
+  Description: This cop checks for redundant uses of `self`.
+  Enabled: false
+
+Style/Lambda:
+  Enabled: true
+  EnforcedStyle: literal
+
+Style/TrailingCommaInHashLiteral:
+  Description: This cop checks for trailing comma in hash literals.
+  Enabled: true
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/GlobalVars:
+  Description: This cop checks for uses of global variables.
+  Enabled: true
+  AllowedVariables:
+    - $redis
