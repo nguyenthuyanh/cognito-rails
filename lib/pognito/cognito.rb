@@ -31,19 +31,19 @@ module Pognito
       end
 
       unless user
-        unset_tokens
+        delete_tokens
 
         return nil
       end
 
-      {
-        username: user.username,
-      }.merge(user.user_attributes.map { |attr| [attr.name, attr.value] }.to_h.symbolize_keys)
+      user.user_attributes.inject({}) do |h, attr|
+        h.merge(attr.name => attr.value)
+      end.merge(username: user.username).symbolize_keys
     end
 
-    def tokens(code)
+    def store_tokens(access_code)
       unless tokens?
-        new_tokens = tokens_from(code)
+        new_tokens = fetch_tokens(access_code)
 
         storage[:access_token] = new_tokens["access_token"]
         storage[:refresh_token] = new_tokens["refresh_token"]
@@ -57,7 +57,7 @@ module Pognito
 
       begin
         @client.global_sign_out({ access_token: })
-        unset_tokens
+        delete_tokens
       rescue Aws::CognitoIdentityProvider::Errors::NotAuthorizedException
         # silence revoked token errors
       end
@@ -68,31 +68,26 @@ module Pognito
     end
 
     def after_sign_in_path(url=nil)
-      storage[:redirect_to] = url if url
+      if url.present?
+        storage[:redirect_to] = url
+      else
+        url = storage[:redirect_to]
+        storage.delete(:redirect_to)
+      end
 
-      storage[:redirect_to]
+      url
     end
-
-    # def redirect_to_after_sign_in(url=nil)
-    #   storage[:redirect_to] = url if url
-
-    #   storage[:redirect_to]
-    # end
-
-    # def clear_redirect_to_after_sign_in
-    #   storage.delete(:redirect_to)
-    # end
 
     private
       def refresh_access_token
-        new_tokens = tokens_from(refresh_token, grant_type: "refresh_token")
+        new_tokens = fetch_tokens(refresh_token, grant_type: "refresh_token")
 
         storage[:access_token] = new_tokens["access_token"]
 
         { access_token: }
       end
 
-      def unset_tokens
+      def delete_tokens
         storage.delete(:access_token)
         storage.delete(:refresh_token)
       end
@@ -105,7 +100,7 @@ module Pognito
         storage[:refresh_token]
       end
 
-      def tokens_from(code, grant_type: "authorization_code")
+      def fetch_tokens(code, grant_type: "authorization_code")
         body = {
           grant_type:,
           client_id: Config.client_id,

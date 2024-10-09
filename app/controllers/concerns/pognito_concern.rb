@@ -25,6 +25,8 @@ module PognitoConcern
     end
 
     def redirect_to_sign_out
+      pognito.sign_out
+
       redirect_to Pognito::Config.sign_out_url, allow_other_host: true
     end
 end

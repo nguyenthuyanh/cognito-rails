@@ -4,10 +4,13 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "articles#index"
 
-  root "index#index"
+  root "application#index"
   get "/logout", to: "pognito#logout"
   get "/login", to: "pognito#login"
-  get "/user", to: "index#user"
+
+  namespace :dashboard do
+    root "application#index"
+
+    get "/profile", to: "user#index"
+  end
 end
-
-
