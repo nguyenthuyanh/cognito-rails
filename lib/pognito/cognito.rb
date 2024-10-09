@@ -6,9 +6,9 @@ module Pognito
 
     def self.client(storage:)
       @client ||= Aws::CognitoIdentityProvider::Client.new(
-        region: ENV["AWS_COGNITO_REGION"],
-        access_key_id: ENV["AWS_ACCESS_KEY"],
-        secret_access_key: ENV["AWS_SECRET_KEY"]
+        region: Config.region,
+        access_key_id: Config.access_key,
+        secret_access_key: Config.client_secret
       )
 
       @storage ||= storage
@@ -52,15 +52,6 @@ module Pognito
       { access_token:, refresh_token: }
     end
 
-    def sign_in_url
-      URI::HTTPS.build(host: ENV["AWS_COGNITO_DOMAIN"], path: "/oauth2/authorize", query: {
-        response_type: :code,
-        client_id: ENV["AWS_COGNITO_APP_CLIENT_ID"],
-        scope: ["email", "openid", "phone", "aws.cognito.signin.user.admin"].join(" "),
-        redirect_uri: "#{ENV["AWS_COGNITO_REDIRECT_URI"]}/login",
-      }.to_query).to_s
-    end
-
     def sign_out
       return unless tokens?
 
@@ -72,26 +63,25 @@ module Pognito
       end
     end
 
-    def sign_out_url
-      URI::HTTPS.build(host: ENV["AWS_COGNITO_DOMAIN"], path: "/logout", query: {
-        client_id: ENV["AWS_COGNITO_APP_CLIENT_ID"],
-        logout_uri: "#{ENV["AWS_COGNITO_REDIRECT_URI"]}/",
-      }.to_query).to_s
-    end
-
     def tokens?
       access_token && refresh_token
     end
 
-    def redirect_to_after_sign_in(url=nil)
+    def after_sign_in_path(url=nil)
       storage[:redirect_to] = url if url
 
       storage[:redirect_to]
     end
 
-    def clear_redirect_to_after_sign_in
-      storage.delete(:redirect_to)
-    end
+    # def redirect_to_after_sign_in(url=nil)
+    #   storage[:redirect_to] = url if url
+
+    #   storage[:redirect_to]
+    # end
+
+    # def clear_redirect_to_after_sign_in
+    #   storage.delete(:redirect_to)
+    # end
 
     private
       def refresh_access_token
@@ -100,12 +90,6 @@ module Pognito
         storage[:access_token] = new_tokens["access_token"]
 
         { access_token: }
-      end
-
-      def encoded_client_credentials
-        Base64.strict_encode64(
-          "#{ENV["AWS_COGNITO_APP_CLIENT_ID"]}:#{ENV["AWS_COGNITO_APP_CLIENT_SECRET"]}"
-        )
       end
 
       def unset_tokens
@@ -121,25 +105,16 @@ module Pognito
         storage[:refresh_token]
       end
 
-      def tokens_from_refresh_token(refresh_token)
-        tokens_from(refresh_token, grant_type: "refresh_token")
-      end
-
       def tokens_from(code, grant_type: "authorization_code")
-        headers = {
-          Authorization: "Basic #{encoded_client_credentials}",
-          "Content-Type": "application/x-www-form-urlencoded",
-        }
-
         body = {
           grant_type:,
-          client_id: ENV["AWS_COGNITO_APP_CLIENT_ID"],
-          redirect_uri: "#{ENV["AWS_COGNITO_REDIRECT_URI"]}/login",
+          client_id: Config.client_id,
+          redirect_uri: "#{Config.redirect_uri}/login",
         }.merge(grant_type == "authorization_code" ? { code: } : { refresh_token: code })
 
-        url = URI::HTTPS.build(host: ENV["AWS_COGNITO_DOMAIN"], path: "/oauth2/token")
+        url = URI::HTTPS.build(host: Config.host, path: Config.endpoints[:token])
 
-        HTTParty.post(url, headers:, body:)
+        HTTParty.post(url, headers: Config.header, body:)
       end
   end
 end
