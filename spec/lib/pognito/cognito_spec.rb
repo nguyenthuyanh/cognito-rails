@@ -28,17 +28,11 @@ RSpec.describe ::Pognito::Cognito, type: :lib do
   describe "#store_tokens" do
     context "when it's first time sign in" do
       before do
-        allow_any_instance_of(described_class).to receive(:fetch_tokens).and_return({
-          "access_token" => access_token, "refresh_token" => refresh_token,
-        })
+        stub_request(:post, /oauth2\/token/)
+          .to_return_json(body: { "access_token" => access_token, "refresh_token" => refresh_token })
       end
 
-      it "fetch token from access code" do
-        expect_any_instance_of(described_class).to receive(:fetch_tokens).with(access_code).once
-        pognito.store_tokens(access_code)
-      end
-
-      it "save token on storage" do
+      it "fetch token from access code and save on storage" do
         expect(pognito.store_tokens(access_code)).to eq({ access_token:, refresh_token: })
       end
     end

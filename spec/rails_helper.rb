@@ -71,7 +71,7 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 
   config.before do
-    stub_request(:any, /cognito-idp.eu-west-3.amazonaws.com:443/)
+    stub_request(:any, /amazonaws.com/)
       .to_return(body: { message: "message" }.to_json)
   end
 end

@@ -68,4 +68,18 @@ RSpec.describe "Authenticate user with cognito IDP", type: :request do
       end
     end
   end
+
+  describe "GET /logout" do
+    let(:cognito_logout_url) { "http://cognito_logout_url" }
+
+    before do
+      allow(Pognito::Config).to receive(:sign_out_url).and_return(cognito_logout_url)
+    end
+
+    it "redirect to Cognito logout page" do
+      get "/logout"
+
+      expect(response).to redirect_to cognito_logout_url
+    end
+  end
 end
