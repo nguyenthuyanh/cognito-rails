@@ -22,6 +22,8 @@ module Pognito
     end
 
     def user
+      return unless tokens?
+
       begin
         refresh_access_token
 

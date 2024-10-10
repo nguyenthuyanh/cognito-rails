@@ -1,13 +1,29 @@
 require "rails_helper"
 
 RSpec.describe ::Pognito::Cognito, type: :lib do
-  subject(:pognito) { described_class.client(storage: session) }
+  subject(:pognito) do
+    described_class.new(storage: session, client:)
+  end
 
+  let(:client) do
+    Aws::CognitoIdentityProvider::Client.new(
+      region: Pognito::Config.region,
+      access_key_id: Pognito::Config.access_key,
+      secret_access_key: Pognito::Config.client_secret
+    )
+  end
   let(:session) { { access_token: nil, refresh_token: nil } }
-  let(:user) { { username: "Test User" } }
   let(:access_code) { "access_code" }
   let(:access_token) { "access_token" }
   let(:refresh_token) { "refresh_token" }
+
+  describe "#client" do
+    subject(:pognito_client) do
+      described_class.client(storage: session)
+    end
+
+    it { expect(pognito_client).to be_instance_of(described_class) }
+  end
 
   describe "#store_tokens" do
     context "when it's first time sign in" do
@@ -38,6 +54,8 @@ RSpec.describe ::Pognito::Cognito, type: :lib do
   end
 
   describe "#user" do
+    let(:session) { { access_token:, refresh_token: } }
+
     context "when tokens is valid" do
       let(:new_access_token) { "new_access_token" }
       let(:user_response) do
@@ -48,6 +66,7 @@ RSpec.describe ::Pognito::Cognito, type: :lib do
         allow_any_instance_of(described_class).to receive(:fetch_tokens).and_return({
           "access_token" => new_access_token,
         })
+        allow_any_instance_of(Aws::CognitoIdentityProvider::Client).to receive(:get_user).and_return(user_response)
       end
 
       it "fetch new access token from refresh token" do
@@ -63,12 +82,17 @@ RSpec.describe ::Pognito::Cognito, type: :lib do
       end
 
       it "return user info" do
-        allow_any_instance_of(Aws::CognitoIdentityProvider::Client).to receive(:get_user).and_return(user_response)
         expect(pognito.user).to eq({ username: "username", email: "test@eversun.fr" })
       end
     end
 
     context "when tokens is invalid" do
+      before do
+        allow_any_instance_of(described_class).to receive(:fetch_tokens).and_return({
+          error: "Invalid token",
+        })
+      end
+
       it "delete old tokens and return nil" do
         expect_any_instance_of(described_class).to receive(:delete_tokens).once
         pognito.user
@@ -82,9 +106,18 @@ RSpec.describe ::Pognito::Cognito, type: :lib do
     context "with exists tokens" do
       let(:session) { { access_token:, refresh_token: } }
 
-      it "call idp sign out method and delete exists tokens" do
+      before do
+        allow_any_instance_of(Aws::CognitoIdentityProvider::Client).to receive(:global_sign_out).and_return(true)
+      end
+
+      it "call idp sign out method" do
         expect_any_instance_of(Aws::CognitoIdentityProvider::Client).to receive(:global_sign_out)
           .with({ access_token: }).once
+
+        pognito.sign_out
+      end
+
+      it "delete exists tokens" do
         expect_any_instance_of(described_class).to receive(:delete_tokens).once
 
         pognito.sign_out

@@ -9,6 +9,8 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 # return unless Rails.env.test?
 require "rspec/rails"
 # Add additional requires below this line. Rails is not loaded until this point!
+require "webmock/rspec"
+
 require "simplecov"
 SimpleCov.start
 
@@ -67,4 +69,9 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+
+  config.before do
+    stub_request(:any, /cognito-idp.eu-west-3.amazonaws.com:443/)
+      .to_return(body: { message: "message" }.to_json)
+  end
 end
