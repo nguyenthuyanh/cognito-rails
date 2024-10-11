@@ -1,0 +1,63 @@
+<div class=wrapper>
+  <div class="head">
+    Env: <%= ENV["RAILS_ENV"] %>
+  </div>
+  <div class="content">
+    <h2>Hey<%= current_user ? " #{current_user[:username]} " : "" %>!</h2>
+  </div>
+  <div>
+    <% if current_user %>
+      <a class="button" href="/dashboard/profile">Go to user page</a>
+      <a class="button" href="/logout">Logout</a>
+      <% else %>
+        <a class="button" href="/login">Login</a>
+        <% end %>
+  </div>
+</div>
+<style>
+  .wrapper {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 10px;
+  }
+
+  body {
+    background-color: #f0f0f0;
+    font-family: sans-serif;
+  }
+
+  .head {
+    background-color: #ffbc00;
+    color: #482882;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+  }
+
+  .content {
+    background-color: #fff;
+    border: 2px solid #ffbc00;
+    color: #482882;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+  }
+
+  .button {
+    background-color: #482882;
+    border: 2px solid #ffbc00;
+    border-radius: 8px;
+    color: white;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    margin-top: 10px;
+    justify-content: center;
+  }
+</style>

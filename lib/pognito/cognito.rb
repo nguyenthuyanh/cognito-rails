@@ -1,4 +1,4 @@
-#frozen_string_literal: true
+# frozen_string_literal: true
 
 module Pognito
   class Cognito
@@ -6,14 +6,14 @@ module Pognito
 
     def self.client(storage:)
       @client ||= Aws::CognitoIdentityProvider::Client.new(
-        region: ENV['AWS_COGNITO_REGION'],
-        access_key_id: ENV['AWS_ACCESS_KEY'],
-        secret_access_key: ENV['AWS_SECRET_KEY']
+        region: Config.region,
+        access_key_id: Config.access_key,
+        secret_access_key: Config.client_secret
       )
 
       @storage ||= storage
 
-      return self.new(storage: @storage, client: @client)
+      self.new(storage: @storage, client: @client)
     end
 
     def initialize(storage:, client:)
@@ -22,136 +22,96 @@ module Pognito
     end
 
     def user
+      return unless tokens?
+
       begin
         refresh_access_token
 
-        user = @client.get_user({access_token: access_token}) if access_token
+        user = @client.get_user({ access_token: }) if access_token
       rescue Aws::CognitoIdentityProvider::Errors::NotAuthorizedException
         user = nil
       end
 
       unless user
-        unset_tokens
+        delete_tokens
 
         return nil
       end
 
-      {
-        username: user.username,
-      }.merge(user.user_attributes.map { |attr| [attr.name, attr.value] }.to_h.symbolize_keys)
+      user.user_attributes.inject({}) do |h, attr|
+        h.merge(attr.name => attr.value)
+      end.merge(username: user.username).symbolize_keys
     end
 
-    def tokens(code)
+    def store_tokens(access_code)
       unless tokens?
-        new_tokens = tokens_from_code(code)
+        new_tokens = fetch_tokens(access_code)
 
-        @storage[:access_token] = new_tokens["access_token"]
-        @storage[:refresh_token] = new_tokens["refresh_token"]
+        storage[:access_token] = new_tokens["access_token"]
+        storage[:refresh_token] = new_tokens["refresh_token"]
       end
 
       { access_token:, refresh_token: }
     end
 
-    def sign_in_url
-      url = "https://#{ENV['AWS_COGNITO_DOMAIN']}/oauth2/authorize"
-
-      "#{url}?response_type=code" \
-        "&client_id=#{ENV['AWS_COGNITO_APP_CLIENT_ID']}" \
-        "&scope=#{scope("email", "openid", "phone", "aws.cognito.signin.user.admin")}" \
-        "&redirect_uri=#{ENV['AWS_COGNITO_REDIRECT_URI']}/login"
-    end
-
     def sign_out
-      if tokens?
-        begin
-          @client.global_sign_out({access_token: access_token})
-          unset_tokens
-        rescue Aws::CognitoIdentityProvider::Errors::NotAuthorizedException
-          # silence revoked token errors
-        end
-      end
-    end
+      return unless tokens?
 
-    def sign_out_url
-      "https://#{ENV['AWS_COGNITO_DOMAIN']}/logout" \
-        "?client_id=#{ENV['AWS_COGNITO_APP_CLIENT_ID']}" \
-        "&logout_uri=#{ENV['AWS_COGNITO_REDIRECT_URI']}/"
+      begin
+        @client.global_sign_out({ access_token: })
+        delete_tokens
+      rescue Aws::CognitoIdentityProvider::Errors::NotAuthorizedException
+        # silence revoked token errors
+      end
     end
 
     def tokens?
       access_token && refresh_token
     end
 
-    def redirect_to_after_sign_in(url = nil)
-      @storage[:redirect_to] = url if url
+    def after_sign_in_path(url=nil)
+      if url.present?
+        storage[:redirect_to] = url
+      else
+        url = storage[:redirect_to]
+        storage.delete(:redirect_to)
+      end
 
-      @storage[:redirect_to]
-    end
-
-    def clear_redirect_to_after_sign_in
-      @storage.delete(:redirect_to)
+      url
     end
 
     private
       def refresh_access_token
-        new_tokens = tokens_from_refresh_token(refresh_token)
+        new_tokens = fetch_tokens(refresh_token, grant_type: "refresh_token")
 
-        @storage[:access_token] = new_tokens["access_token"]
+        storage[:access_token] = new_tokens["access_token"]
 
         { access_token: }
       end
 
-      def scope(*args)
-        args.join('+')
-      end
-
-      def encoded_client_credentials
-        Base64.strict_encode64(
-          "#{ENV['AWS_COGNITO_APP_CLIENT_ID']}:#{ENV['AWS_COGNITO_APP_CLIENT_SECRET']}"
-        )
-      end
-
-      def unset_tokens
-        @storage.delete(:access_token)
-        @storage.delete(:refresh_token)
+      def delete_tokens
+        storage.delete(:access_token)
+        storage.delete(:refresh_token)
       end
 
       def access_token
-        @storage[:access_token]
+        storage[:access_token]
       end
 
       def refresh_token
-        @storage[:refresh_token]
+        storage[:refresh_token]
       end
 
-      def tokens_from_code(code)
-        tokens_from(code)
-      end
-
-      def tokens_from_refresh_token(refresh_token)
-        tokens_from(refresh_token, grant_type: "refresh_token")
-      end
-
-      def tokens_from(value, grant_type: "code")
-        type = grant_type === "code" ? "authorization_code" : "refresh_token"
-        type_key = grant_type === "code" ? "code" : "refresh_token"
-
-        headers = {
-          Authorization: "Basic #{encoded_client_credentials}",
-          "Content-Type": "application/x-www-form-urlencoded"
-        }
-
+      def fetch_tokens(code, grant_type: "authorization_code")
         body = {
-          grant_type: type,
-          client_id: ENV['AWS_COGNITO_APP_CLIENT_ID'],
-          redirect_uri: "#{ENV['AWS_COGNITO_REDIRECT_URI']}/login"
-        }
+          grant_type:,
+          client_id: Config.client_id,
+          redirect_uri: "#{Config.redirect_uri}/login",
+        }.merge(grant_type == "authorization_code" ? { code: } : { refresh_token: code })
 
-        body[type_key] = value
+        url = URI::HTTPS.build(host: Config.host, path: Config.endpoints[:token])
 
-        url = "https://#{ENV['AWS_COGNITO_DOMAIN']}/oauth2/token"
-
-        HTTParty.post(url, headers: headers, body: body)
+        HTTParty.post(url, headers: Config.header, body:)
       end
   end
 end
