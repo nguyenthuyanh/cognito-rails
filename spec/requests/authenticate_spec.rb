@@ -1,8 +1,10 @@
 require "rails_helper"
 
-class Dashboard::FooBarController < Dashboard::ApplicationController
-  def index
-    render plain: "OK"
+module Dashboard
+  class FooBarController < Dashboard::ApplicationController
+    def index
+      render plain: "OK"
+    end
   end
 end
 
