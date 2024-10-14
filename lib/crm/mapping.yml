@@ -2,7 +2,7 @@
 #
 # Example:
 # hubspot_object:
-#   file:
+#   files:
 #     file1: hubspot_propertie_1
 #     file2: hubspot_propertie_2
 
