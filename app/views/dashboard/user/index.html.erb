@@ -7,12 +7,21 @@
     <ul>
       <Li>Email: <%= current_user[:email] %></li>
       <Li>User ID: <%= current_user[:sub] %></li>
-      <% documents.each do |attr, files| %>
+      <% contact_files.each do |attr, files| %>
         <li>
           <%= attr %>:
           <% files.each do |file| %>
             <%= link_to file.name, file.url, target: :_blank, class: "underline" %>,
           <% end %>
+        </li>
+      <% end %>
+
+      <% deal_files.each do |attr, files| %>
+        <li>
+          <%= attr %>:
+            <% files.each do |file| %>
+              <%= link_to file.name, file.url, target: :_blank, class: "underline" %>,
+                <% end %>
         </li>
       <% end %>
     </ul>

@@ -71,7 +71,7 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 
   config.before do
-    stub_request(:any, /amazonaws.com/)
-      .to_return(body: { message: "message" }.to_json)
+    stub_request(:any, /amazonaws.com/).to_return(body: { message: "message" }.to_json)
+    stub_request(:any, /api.hubapi.com/).to_return(body: { properties: { id: "object_id" } }.to_json)
   end
 end
