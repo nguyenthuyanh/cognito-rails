@@ -1,0 +1,18 @@
+# This YAML file defines how specific attributes in HubSpot (e.g., contact, deal) are mapped to local attributes.
+#
+# Example:
+# hubspot_object:
+#   files:
+#     file1: hubspot_propertie_1
+#     file2: hubspot_propertie_2
+
+contact:
+  files:
+    file1: document_2
+    file2: contact_document
+
+deal:
+  files:
+    impot_file: documentfiletest
+    mairie_file: mairie_document
+    contract_file: contract_document
