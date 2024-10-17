@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "hubspot/codegen/files/models/file"
+
 module Crm
   class MappingError < StandardError; end
 

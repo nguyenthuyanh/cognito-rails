@@ -12,5 +12,7 @@ Rails.application.routes.draw do
     root "application#index"
 
     get "/profile", to: "user#index"
+
+    put "/deal", to: "deals#update"
   end
 end
