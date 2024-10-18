@@ -2,8 +2,7 @@ module Dashboard
   class UserController < ApplicationController
     def index
       # TODO: update with real data
-      contact_id = current_user[:"custom:hubspot_contact_id"]
-      # contact_id = 32_038_733_775
+      contact_id = 32_038_733_775
 
       crm = Crm::Hubspot.new
       contact_files = crm.get_contact_files(id: contact_id, file_attrs: [:file1])

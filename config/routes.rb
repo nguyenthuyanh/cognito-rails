@@ -13,6 +13,6 @@ Rails.application.routes.draw do
 
     get "/profile", to: "user#index"
 
-    put "/deal", to: "deals#update"
+    resources :projects, only: [:index, :update]
   end
 end
