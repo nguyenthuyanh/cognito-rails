@@ -1,6 +1,7 @@
 <div class="w-1/2 mx-auto border p-10">
   <div class="text-lg font-bold mb-10">Upload file to related deal</div>
   <%= form_with scope: :project, url: dashboard_project_path(deal_id), method: :put do |f| %>
+    <%= f.hidden_field :deal_id, value: deal_id %>
     <div class="mb-6">
       <%= f.label :impot_file %>
       <%= f.file_field :impot_file %>
