@@ -16,11 +16,17 @@ module Crm
     ATTR_MAPPING.each_key do |object_name|
       # Get object data by object id
       define_method("get_#{object_name}") do |id:, associations: nil, properties: nil|
-        client.crm.send(object_name.to_s.pluralize).basic_api.get_by_id(
+        result = client.crm.send(object_name.to_s.pluralize).basic_api.get_by_id(
           "#{object_name}_id": id,
           associations:,
           properties:
         )
+
+        attr_mapping = ATTR_MAPPING[object_name.to_sym]
+
+        args = build_mapping_object(result, attr_mapping)
+
+        "crm/models/#{object_name}".camelize.constantize.new(args)
       end
 
       define_method("update_#{object_name}") do |id:, properties: nil|
@@ -41,15 +47,12 @@ module Crm
           file_mapping[attr]
         end
 
-        files = send("get_#{object_name}", id:, properties:).properties
+        files = send("get_#{object_name}", id:, properties:)
 
         file_attrs.each_with_object({}) do |attr, hash|
-          propertie_name = file_mapping[attr]
+          next if files[attr].blank?
 
-          next if files[propertie_name].blank?
-
-          file_ids = files[propertie_name].split(";")
-          file_urls = file_ids.map { |file_id| get_file_url(file_id) }
+          file_urls = files[attr].map { |file_id| get_file_url(file_id) }
 
           hash[attr] = file_urls
         end
@@ -66,6 +69,38 @@ module Crm
     end
 
     private
+      def build_mapping_object(res, mapping)
+        object_hash = {}
+
+        object_hash.merge!(maping_associations(res, mapping[:associations])) if mapping[:associations].present?
+        object_hash.merge!(maping_properties(res, mapping[:properties])) if mapping[:properties].present?
+        object_hash.merge!(maping_files(res, mapping[:files])) if mapping[:files].present?
+
+        object_hash.compact.deep_symbolize_keys
+      end
+
+      def maping_associations(res, attr_mapping)
+        attr_mapping.each_with_object({}) do |association, hash|
+          if (object = res&.associations&.[](association.to_s.pluralize)).present?
+            hash["#{association}_ids"] = object.results.map(&:id)
+          end
+        end
+      end
+
+      def maping_properties(res, attr_mapping)
+        attr_mapping.each_with_object({}) do |object, hash|
+          attr_name, prop_name = object
+          hash[attr_name] = res.properties[prop_name]
+        end
+      end
+
+      def maping_files(res, attr_mapping)
+        attr_mapping.each_with_object({}) do |object, hash|
+          attr_name, prop_name = object
+          hash[attr_name] = res.properties[prop_name]&.split(";")
+        end
+      end
+
       def get_file_url(id)
         client.files.files_api.get_signed_url(file_id: id)
       end

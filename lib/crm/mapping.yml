@@ -3,16 +3,28 @@
 # Example:
 # hubspot_object:
 #   files:
-#     file1: hubspot_propertie_1
-#     file2: hubspot_propertie_2
+#     file1: hubspot_property_1
+#     file2: hubspot_property_2
 
 contact:
+  associations:
+    - deal
+  properties:
+    email: email
+    first_name: firtname
+    created_at: createdate
+    updated_at: lastmodifieddate
   files:
     file1: document_2
     file2: contact_document
 
 deal:
+  associations:
+    - quote
   files:
     impot_file: documentfiletest
     mairie_file: mairie_document
     contract_file: contract_document
+quote:
+  properties:
+    reference: hs_quote_number
