@@ -102,7 +102,7 @@ RSpec.describe BaseService do
       context "when object is not provided" do
         it "returns a new instance of" do
           expect(inherited_service.alice).to be_a(Alice)
-          expect(inherited_service.alice.name).to eq(nil)
+          expect(inherited_service.alice.name).to be_nil
         end
       end
 
@@ -131,7 +131,7 @@ RSpec.describe BaseService do
     describe "#resource" do
       context "when object is not provided" do
         it "returns nil" do
-          expect(inherited_service.resource).to eq(nil)
+          expect(inherited_service.resource).to be_nil
         end
       end
     end

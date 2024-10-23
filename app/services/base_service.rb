@@ -3,7 +3,9 @@
 # Base service.
 # If object is not provided, it will be initialized with the object class from the singularized parent if possible.
 # If object is provided, it will be used as is.
-# Additional getter (public) and setter (private) for object will be automatically set as the singularized and underscored parent of the class if present
+# Additional getter (public) and setter (private) for object will be automatically set as the singularized
+# and underscored parent of the class if present
+
 class BaseService
   class << self
     def call(object: nil, params: {})
