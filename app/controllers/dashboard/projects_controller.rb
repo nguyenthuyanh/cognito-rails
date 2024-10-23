@@ -7,13 +7,13 @@ module Dashboard
       deal_id = Crm::Hubspot.new.get_contact(
         id: current_user[:"custom:hubspot_contact_id"],
         associations: :deal
-      ).associations["deals"].results.first.id
+      ).deal_ids.first
 
       render locals: { deal_id: }
     end
 
     def update
-      result = Crm::HubspotServices::UploadDocumentService.call(params: project_params)
+      result = Crm::HubspotServices::UploadDocuments.call(params: project_params)
 
       redirect_to dashboard_profile_path if result.success?
     end

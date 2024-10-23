@@ -10,8 +10,10 @@ module Crm
         attr_mapping = Hubspot::ATTR_MAPPING[model_name]
         @attributes = attr_mapping.slice(:properties, :files).values.reduce({}, :merge).keys
 
-        association_attr = attr_mapping[:associations].map { |attr| "#{attr}_ids".to_sym }
-        @attributes.push(*association_attr)
+        if attr_mapping[:associations].present?
+          association_attr = attr_mapping[:associations].map { |attr| "#{attr}_ids".to_sym }
+          @attributes.push(*association_attr)
+        end
 
         @attributes.each do |attr_name|
           self.class.class_eval { attr_accessor attr_name }
@@ -24,21 +26,21 @@ module Crm
         @client_api = Hubspot.new
       end
 
-      def retrieve(association: nil, attributes: nil)
-        raise AttributeMissingError, "Id is required" if id.blank?
+      # def retrieve(association: nil, attributes: nil)
+      #   raise AttributeMissingError, "Id is required" if id.blank?
 
-        results = client_api.send("get_#{model_name}", id:, associations: association, properties: attributes)
+      #   results = client_api.send("get_#{model_name}", id:, associations: association, properties: attributes)
 
-        build_object_from_response(results)
-      end
+      #   build_object_from_response(results)
+      # end
 
-      def retrieve_files
-        raise AttributeMissingError, "Id is required" if id.blank?
+      # def retrieve_files
+      #   raise AttributeMissingError, "Id is required" if id.blank?
 
-        results = client_api.send("get_#{model_name}_files", id:)
+      #   results = client_api.send("get_#{model_name}_files", id:)
 
-        build_object_from_response(results)
-      end
+      #   build_object_from_response(results)
+      # end
 
       private
         def model_name

@@ -5,22 +5,23 @@
   <div class="content">
     <h2>Logged as: <%= current_user[:username] %></h2>
     <ul>
-      <Li>Email: <%= current_user[:email] %></li>
-      <Li>User ID: <%= current_user[:sub] %></li>
-      <Li>Hubspot contact ID: <%= current_user[:"custom:hubspot_contact_id"] %></li>
-      <% contact_files.each do |attr, files| %>
+      <li>Email: <%= current_user[:email] %></li>
+      <li>User ID: <%= current_user[:sub] %></li>
+      <li>Hubspot contact ID: <%= current_user[:"custom:hubspot_contact_id"] %></li>
+      <li>Related quotes: <%= quotes.map(&:reference).join(", ") %></li>
+      <% [:file1, :file2].each do |attr| %>
         <li>
           <%= attr %>:
-          <% files.each do |file| %>
+          <% contact.send(attr).each do |file| %>
             <%= link_to file.name, file.url, target: :_blank, class: "underline" %>,
           <% end %>
         </li>
       <% end %>
 
-      <% deal_files.each do |attr, files| %>
+      <% [:impot_file, :mairie_file, :contract_file].each do |attr| %>
         <li>
           <%= attr %>:
-            <% files.each do |file| %>
+            <% deal.send(attr).each do |file| %>
               <%= link_to file.name, file.url, target: :_blank, class: "underline" %>,
                 <% end %>
         </li>

@@ -25,7 +25,7 @@ RSpec.describe ::Crm::Hubspot, type: :lib do
         it "upload file then attach to #{object} object" do
           expect_any_instance_of(described_class).to receive(:upload_file).with(file, nil).once
           expect_any_instance_of(described_class).to receive("update_#{object}")
-            .with(id: object_id, properties: { file_property => file_id }).once
+            .with(id: object_id, attributes: { file_attr => file_id }).once
 
           crm.send("upload_#{object}_file", object_id, file_attr, file)
         end

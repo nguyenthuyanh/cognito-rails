@@ -13,73 +13,88 @@ module Crm
       @client = ::Hubspot::Client.new(access_token: ENV["HUBSPOT_API_KEY"])
     end
 
-    ATTR_MAPPING.each_key do |object_name|
+    ATTR_MAPPING.each_key do |object_name| # rubocop:disable Metrics/BlockLength
       # Get object data by object id
-      define_method("get_#{object_name}") do |id:, associations: nil, properties: nil|
+      define_method("get_#{object_name}") do |id:, associations: nil, attributes: nil|
+        object_mapping = ATTR_MAPPING[object_name.to_sym]
+
         result = client.crm.send(object_name.to_s.pluralize).basic_api.get_by_id(
           "#{object_name}_id": id,
           associations:,
-          properties:
+          properties: get_mapping_properties(object_mapping, attributes)
         )
 
-        attr_mapping = ATTR_MAPPING[object_name.to_sym]
-
-        args = build_mapping_object(result, attr_mapping)
+        args = build_mapping_object(result, object_mapping)
 
         "crm/models/#{object_name}".camelize.constantize.new(args)
       end
 
-      define_method("update_#{object_name}") do |id:, properties: nil|
+      define_method("update_#{object_name}") do |id:, attributes:|
         client.crm.send(object_name.to_s.pluralize).basic_api.update(
           "#{object_name}_id": id,
-          body: { properties: }
+          body: { properties: get_mapping_params(ATTR_MAPPING[object_name.to_sym], attributes) }
         )
       end
 
       # Get files download url, get all files by default
       define_method("get_#{object_name}_files") do |id:, file_attrs: nil|
-        file_mapping = ATTR_MAPPING[object_name.to_sym][:files]
-        file_attrs ||= file_mapping.keys
+        file_attrs ||= ATTR_MAPPING[object_name.to_sym][:files].keys
 
-        properties = file_attrs.map do |attr|
-          raise MappingError, "No attribute matches '#{attr}'" unless file_mapping.key?(attr)
+        object = send("get_#{object_name}", id:, attributes: file_attrs)
 
-          file_mapping[attr]
+        file_attrs.each do |attr|
+          next if object.send(attr).blank?
+
+          file_urls = object.send(attr).map { |file_id| get_file_url(file_id) }
+
+          object.send("#{attr}=", file_urls)
         end
 
-        files = send("get_#{object_name}", id:, properties:)
-
-        file_attrs.each_with_object({}) do |attr, hash|
-          next if files[attr].blank?
-
-          file_urls = files[attr].map { |file_id| get_file_url(file_id) }
-
-          hash[attr] = file_urls
-        end
+        object
       end
 
       define_method("upload_#{object_name}_file") do |id, attribute, file|
         file_name = file.original_filename if file.is_a?(ActionDispatch::Http::UploadedFile)
         file = upload_file(file, file_name)
 
-        file_attr = ATTR_MAPPING.dig(object_name.to_sym, :files, attribute)
+        # file_attr = ATTR_MAPPING.dig(object_name.to_sym, :files, attribute)
 
-        send("update_#{object_name}", id:, properties: { file_attr => file.id })
+        send("update_#{object_name}", id:, attributes: { attribute => file.id })
       end
     end
 
     private
+      def get_mapping_properties(object_mapping, attributes)
+        properties_mapping = object_mapping.slice(:properties, :files).values.reduce({}, :merge)
+        attributes&.map do |attr|
+          raise MappingError, "No attribute matches '#{attr}'" unless properties_mapping.key?(attr)
+
+          properties_mapping[attr]
+        end
+      end
+
+      def get_mapping_params(object_mapping, attributes)
+        properties_mapping = object_mapping.slice(:properties, :files).values.reduce({}, :merge)
+
+        attributes&.each_with_object({}) do |attribute, hash|
+          attr_name, attr_value = attribute
+          raise MappingError, "No attribute matches '#{attr_name}'" unless properties_mapping.key?(attr_name)
+
+          hash[properties_mapping[attr_name]] = attr_value
+        end
+      end
+
       def build_mapping_object(res, mapping)
         object_hash = {}
 
-        object_hash.merge!(maping_associations(res, mapping[:associations])) if mapping[:associations].present?
-        object_hash.merge!(maping_properties(res, mapping[:properties])) if mapping[:properties].present?
-        object_hash.merge!(maping_files(res, mapping[:files])) if mapping[:files].present?
+        object_hash.merge!(build_mapping_associations(res, mapping[:associations])) if mapping[:associations].present?
+        object_hash.merge!(build_mapping_properties(res, mapping[:properties])) if mapping[:properties].present?
+        object_hash.merge!(build_mapping_files(res, mapping[:files])) if mapping[:files].present?
 
         object_hash.compact.deep_symbolize_keys
       end
 
-      def maping_associations(res, attr_mapping)
+      def build_mapping_associations(res, attr_mapping)
         attr_mapping.each_with_object({}) do |association, hash|
           if (object = res&.associations&.[](association.to_s.pluralize)).present?
             hash["#{association}_ids"] = object.results.map(&:id)
@@ -87,14 +102,14 @@ module Crm
         end
       end
 
-      def maping_properties(res, attr_mapping)
+      def build_mapping_properties(res, attr_mapping)
         attr_mapping.each_with_object({}) do |object, hash|
           attr_name, prop_name = object
           hash[attr_name] = res.properties[prop_name]
         end
       end
 
-      def maping_files(res, attr_mapping)
+      def build_mapping_files(res, attr_mapping)
         attr_mapping.each_with_object({}) do |object, hash|
           attr_name, prop_name = object
           hash[attr_name] = res.properties[prop_name]&.split(";")
