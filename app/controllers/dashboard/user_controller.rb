@@ -9,7 +9,7 @@ module Dashboard
       deal = crm.get_deal_files(id: deal_id)
 
       quote_ids = crm.get_deal(id: deal_id, associations: :quote).quote_ids
-      quotes = quote_ids.map { |id| crm.get_quote(id:, attributes: [:reference]) }
+      quotes = quote_ids.map { |id| crm.get_quote(id:, attributes: [:reference, :download_url]) }
 
       render locals: { contact:, deal:, quotes: }
     end

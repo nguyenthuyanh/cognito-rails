@@ -28,3 +28,4 @@ deal:
 quote:
   properties:
     reference: hs_quote_number
+    download_url: hs_pdf_download_link
