@@ -10,8 +10,8 @@ RSpec.describe ::Crm::Hubspot, type: :lib do
     describe "#upload_#{object}_file" do
       context "with valid argument" do
         let(:file_attr) { :foo }
-        let(:file_propertie) { :bar }
-        let(:attr_mapping) { { object => { files: { file_attr => file_propertie } } } }
+        let(:file_property) { :bar }
+        let(:attr_mapping) { { object => { files: { file_attr => file_property } } } }
         let(:file) { File.open(Rails.root.join("spec/test.txt").to_s) }
         let(:object_id) { "object_id" }
         let(:file_id) { "file_id" }
@@ -25,7 +25,7 @@ RSpec.describe ::Crm::Hubspot, type: :lib do
         it "upload file then attach to #{object} object" do
           expect_any_instance_of(described_class).to receive(:upload_file).with(file, nil).once
           expect_any_instance_of(described_class).to receive("update_#{object}")
-            .with(id: object_id, properties: { file_propertie => file_id }).once
+            .with(id: object_id, attributes: { file_attr => file_id }).once
 
           crm.send("upload_#{object}_file", object_id, file_attr, file)
         end
