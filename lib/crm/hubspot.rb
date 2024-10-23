@@ -57,8 +57,6 @@ module Crm
         file_name = file.original_filename if file.is_a?(ActionDispatch::Http::UploadedFile)
         file = upload_file(file, file_name)
 
-        # file_attr = ATTR_MAPPING.dig(object_name.to_sym, :files, attribute)
-
         send("update_#{object_name}", id:, attributes: { attribute => file.id })
       end
     end

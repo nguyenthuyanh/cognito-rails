@@ -20,7 +20,7 @@ module Dashboard
 
     private
       def project_params
-        params.require(:project).permit(:deal_id, :impot_file, :mairie_file, :contract_file)
+        params.require(:project).permit(:deal_id, :impot_file, :mairie_file, :contract_file).merge(deal_id: params[:id])
       end
   end
 end

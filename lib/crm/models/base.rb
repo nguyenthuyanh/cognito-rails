@@ -26,22 +26,6 @@ module Crm
         @client_api = Hubspot.new
       end
 
-      # def retrieve(association: nil, attributes: nil)
-      #   raise AttributeMissingError, "Id is required" if id.blank?
-
-      #   results = client_api.send("get_#{model_name}", id:, associations: association, properties: attributes)
-
-      #   build_object_from_response(results)
-      # end
-
-      # def retrieve_files
-      #   raise AttributeMissingError, "Id is required" if id.blank?
-
-      #   results = client_api.send("get_#{model_name}_files", id:)
-
-      #   build_object_from_response(results)
-      # end
-
       private
         def model_name
           @model_name ||= self.class.to_s.demodulize.underscore.to_sym
