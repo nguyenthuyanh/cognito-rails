@@ -13,6 +13,11 @@
           <%= link_to quote.reference, quote.download_url, target: :_blank, class: "underline" %>
         <% end %>
       </li>
+      <li>Related invoices:
+        <% invoices.each do |invoice| %>
+          <%= link_to invoice[:invoice_number], invoice[:file_url], target: :_blank, class: "underline" %>
+        <% end %>
+      </li>
       <% [:file1, :file2].each do |attr| %>
         <li>
           <%= attr %>:
