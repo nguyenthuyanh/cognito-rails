@@ -14,6 +14,7 @@ services:
     expose:
       - 3000
     depends_on:
+      - db
       - redis
 
   web:
@@ -26,6 +27,16 @@ services:
       - 443:443
       - 80:80
 
+  db:
+    image: postgres:16.4
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${RDS_PASSWORD}
+      POSTGRES_HOST: localhost
+    ports:
+      - "5432:5432"
+
   redis:
     image: redis
     ports:
@@ -37,3 +48,7 @@ services:
     ports: []
     depends_on:
       - app
+
+volumes:
+  postgres-data:
+    driver: local

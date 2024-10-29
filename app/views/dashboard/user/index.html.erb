@@ -8,7 +8,16 @@
       <li>Email: <%= current_user[:email] %></li>
       <li>User ID: <%= current_user[:sub] %></li>
       <li>Hubspot contact ID: <%= current_user[:"custom:hubspot_contact_id"] %></li>
-      <li>Related quotes: <%= quotes.map(&:reference).join(", ") %></li>
+      <li>Related quotes:
+        <% quotes.each do |quote| %>
+          <%= link_to quote.reference, quote.download_url, target: :_blank, class: "underline" %>
+        <% end %>
+      </li>
+      <li>Related invoices:
+        <% invoices.each do |invoice| %>
+          <%= link_to invoice[:invoice_number], invoice[:file_url], target: :_blank, class: "underline" %>
+        <% end %>
+      </li>
       <% [:file1, :file2].each do |attr| %>
         <li>
           <%= attr %>:
