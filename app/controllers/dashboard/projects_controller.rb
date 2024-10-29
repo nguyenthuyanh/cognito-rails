@@ -1,7 +1,5 @@
 module Dashboard
   class ProjectsController < ApplicationController
-    protect_from_forgery with: :null_session, only: [:update]
-
     def index
       # TODO: adapt to several deals
       deal_id = Crm::Hubspot.new.get_contact(
