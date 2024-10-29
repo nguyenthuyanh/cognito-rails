@@ -3,14 +3,12 @@
     Env: <%= ENV["RAILS_ENV"] %>
   </div>
   <div class="content">
-    <h2>Hey<%= current_user ? " #{current_user[:username]} " : "" %>!</h2>
+    <h2>Hey<%= current_user ? " #{current_user.first_name} " : "" %>!</h2>
   </div>
   <div data-turbo-prefetch="false">
-    <%= link_to "Go to user page", dashboard_profile_path, class: "btn" %>
+    <%= link_to "Go to user page", dashboard_profile_path, class: "button" %>
     <%= link_to "Go to upload file page", dashboard_projects_path, class: "button" %>
     <%= link_to "Logout", logout_path, class: "button" %>
-
-
   </div>
 </div>
 <style>

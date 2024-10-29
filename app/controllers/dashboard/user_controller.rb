@@ -2,10 +2,9 @@ module Dashboard
   class UserController < ApplicationController
     def index
       # TODO: update with real data
-      contact_id = 32_038_733_775
       hubspot = Crm::Hubspot.new
-      contact = hubspot.get_contact_files(id: contact_id, file_attrs: [:file1, :file2])
-      deal_id = hubspot.get_contact(id: contact_id, associations: :deal).deal_ids.first
+      contact = hubspot.get_contact_files(id: current_user.hs_contact_id, file_attrs: [:file1, :file2])
+      deal_id = hubspot.get_contact(id: current_user.hs_contact_id, associations: :deal).deal_ids.first
       deal = hubspot.get_deal_files(id: deal_id)
 
       quote_ids = hubspot.get_deal(id: deal_id, associations: :quote).quote_ids
