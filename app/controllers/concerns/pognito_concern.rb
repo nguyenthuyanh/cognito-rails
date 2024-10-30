@@ -15,10 +15,18 @@ module PognitoConcern
     end
 
     def current_user
-      @current_user ||= UserServices::UpdateInfo.call(
+      @current_user ||= find_or_create_user
+    end
+
+    def find_or_create_user
+      result = UserServices::UpdateInfo.call(
         object: User.find_or_initialize_by(uuid: pognito.user["sub"]),
         params: pognito.user
-      ).user
+      )
+
+      flash[:alert] = result.errors unless result.success?
+
+      result.user
     end
 
     def redirect_to_sign_in

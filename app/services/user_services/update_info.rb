@@ -1,11 +1,13 @@
 module UserServices
   class UpdateInfoError < StandardError; end
+
   class UpdateInfo < BaseService
     def call
       assign_cognito_info
-      assign_pennylane_info
+      assign_pennylane_info if user.pl_client_id.blank?
 
-      user.save!
+      add_errors(**user.errors) unless user.valid?
+      user.save
     end
 
     private
@@ -26,13 +28,13 @@ module UserServices
 
         pl_clients = related_quotes.map { |quote| pennylane.get_client_by_reference(quote.reference) }
 
-        raise UpdateInfoError.new("Match multiple Pennylane clients, should have only one") if pl_clients.size > 1
+        raise UpdateInfoError, "Match multiple Pennylane clients, should have only one" if pl_clients.size > 1
 
-        user.pl_client_id = pl_client[:source_id]
+        user.pl_client_id = pl_clients.first[:source_id]
       end
 
       def related_quotes
-        @related_quote ||= Crm::Hubspot.new.get_quotes_from_contact_id(user.hs_contact_id)
+        @related_quotes ||= Crm::Hubspot.new.get_quotes_from_contact_id(user.hs_contact_id)
       end
   end
 end

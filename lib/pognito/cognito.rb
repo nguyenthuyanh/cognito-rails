@@ -38,7 +38,7 @@ module Pognito
 
       user.user_attributes.inject({}) do |h, attr|
         h.merge(attr.name => attr.value)
-      end
+      end.merge("username" => user.username)
     end
 
     def store_tokens(access_code)

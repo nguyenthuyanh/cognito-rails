@@ -130,6 +130,13 @@ GEM
     erubi (1.13.0)
     ethon (0.16.0)
       ffi (>= 1.15.0)
+    factory_bot (6.5.0)
+      activesupport (>= 5.0.0)
+    factory_bot_rails (6.4.4)
+      factory_bot (~> 6.5)
+      railties (>= 5.0.0)
+    faker (3.5.1)
+      i18n (>= 1.8.11, < 2)
     ffi (1.17.0-aarch64-linux-gnu)
     ffi (1.17.0-x86_64-darwin)
     ffi (1.17.0-x86_64-linux-gnu)
@@ -310,6 +317,8 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
+    shoulda-matchers (6.4.0)
+      activesupport (>= 5.2.0)
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
@@ -376,6 +385,8 @@ DEPENDENCIES
   capybara
   debug
   dotenv-rails
+  factory_bot_rails
+  faker
   httparty
   hubspot-api-client
   importmap-rails
@@ -393,6 +404,7 @@ DEPENDENCIES
   rubocop-rails
   rubocop-rspec
   selenium-webdriver
+  shoulda-matchers
   simplecov
   sprockets-rails
   stimulus-rails

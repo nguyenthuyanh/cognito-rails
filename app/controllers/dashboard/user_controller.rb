@@ -10,9 +10,7 @@ module Dashboard
       quote_ids = hubspot.get_deal(id: deal_id, associations: :quote).quote_ids
       quotes = quote_ids.map { |id| hubspot.get_quote(id:, attributes: [:reference, :download_url]) }
 
-      pennylane = Crm::Pennylane.new
-      pl_client = pennylane.get_client_by_reference(quotes.first.reference)
-      invoices = pennylane.get_invoices_by_client_id(pl_client[:source_id])
+      invoices = Crm::Pennylane.new.get_invoices_by_client_id(current_user.pl_client_id)
 
       render locals: { contact:, deal:, quotes:, invoices: }
     end

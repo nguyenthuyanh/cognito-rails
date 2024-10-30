@@ -76,7 +76,7 @@ RSpec.describe ::Pognito::Cognito, type: :lib do
       end
 
       it "return user info" do
-        expect(pognito.user).to eq({ username: "username", email: "test@eversun.fr" })
+        expect(pognito.user).to eq({ "username" => "username", "email" => "test@eversun.fr" })
       end
     end
 

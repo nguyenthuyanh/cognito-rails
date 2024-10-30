@@ -15,11 +15,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_25_140816) do
   enable_extension "plpgsql"
 
   create_table "users", force: :cascade do |t|
-    t.string "uuid"
+    t.string "uuid", null: false
     t.string "hs_contact_id"
     t.string "pl_client_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["hs_contact_id"], name: "index_users_on_hs_contact_id", unique: true
+    t.index ["pl_client_id"], name: "index_users_on_pl_client_id", unique: true
+    t.index ["uuid"], name: "index_users_on_uuid", unique: true
   end
 
 end

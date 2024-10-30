@@ -1,0 +1,16 @@
+<% if flash.any? %>
+  <% flash.each do |key, value| %>
+    <div data-controller="flash" data-key="<%= key %>" class="
+        group fixed top-24 right-5 z-[100] flex max-w-sm items-center rounded-lg
+        py-3 px-5 data-[key=alert]:bg-[#DE475E] data-[key=notice]:bg-[#00D296]
+      ">
+      <div class="mr-4 text-sm font-semibold group-data-[key=alert]:text-white">
+        <%= simple_format(value.is_a?(Array) ? value.join("\n") : value) %>
+      </div>
+
+      <button type="button" data-action="flash#dismiss" class="flex items-center">
+        <i class="fa-solid fa-xmark hover:opacity-80 group-data-[key=alert]:text-white"></i>
+      </button>
+    </div>
+  <% end %>
+<% end %>
