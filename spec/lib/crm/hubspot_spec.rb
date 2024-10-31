@@ -3,14 +3,33 @@ require "rails_helper"
 RSpec.describe ::Crm::Hubspot, type: :lib do
   subject(:crm) { described_class.new }
 
+  let(:file_attr) { :foo }
+  let(:file_property) { :bar }
+
   described_class::ATTR_MAPPING.each_key do |object|
-    it { is_expected.to respond_to("get_#{object}") }
-    it { is_expected.to respond_to("get_#{object}_files") }
+    it { expect(crm.send("get_#{object}", id: "id")).to be_a("crm/models/#{object}".camelize.constantize) }
+
+    it {
+      expect(crm.send("get_#{object}_files", id: "id")).to be_a("crm/models/#{object}".camelize.constantize)
+    }
+
+    describe "#update_#{object}" do
+      let(:attr_mapping) { { object => { properties: { file_attr => file_property } } } }
+
+      context "with valid argument" do
+        before do
+          stub_const("#{described_class}::ATTR_MAPPING", attr_mapping)
+        end
+
+        it {
+          expect(crm.send("update_#{object}", id: "id",
+            attributes: { file_attr => file_property })).not_to be_nil
+        }
+      end
+    end
 
     describe "#upload_#{object}_file" do
       context "with valid argument" do
-        let(:file_attr) { :foo }
-        let(:file_property) { :bar }
         let(:attr_mapping) { { object => { files: { file_attr => file_property } } } }
         let(:file) { File.open(Rails.root.join("spec/test.txt").to_s) }
         let(:object_id) { "object_id" }

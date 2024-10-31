@@ -50,11 +50,9 @@ module Crm
         queries: { filter: filters }
       )
 
-      if response[:total_customers] == 1
-        return response[:customers].first
-      else
-        raise PennylaneError.new("Found #{response[:total_customers]} customers with same reference")
-      end
+      return response[:customers].first if response[:total_customers] == 1
+
+      raise PennylaneError, "Found #{response[:total_customers].to_i} customers with same reference"
     end
 
     def get_invoices_by_client_id(id)

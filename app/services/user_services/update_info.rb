@@ -2,6 +2,16 @@ module UserServices
   class UpdateInfoError < StandardError; end
 
   class UpdateInfo < BaseService
+    COGNITO_MAPPING = {
+      "sub" => :uuid,
+      "username" => :user_name,
+      "given_name" => :first_name,
+      "family_name" => :last_name,
+      "email" => :email,
+      "phone_number" => :phone,
+      "custom:hubspot_contact_id" => :hs_contact_id,
+    }.freeze
+
     def call
       assign_cognito_info
       assign_pennylane_info if user.pl_client_id.blank?
@@ -13,7 +23,7 @@ module UserServices
     private
       def assign_cognito_info
         params.each do |key, value|
-          mapping_attr = User::COGNITO_MAPPING[key]
+          mapping_attr = COGNITO_MAPPING[key]
 
           next unless mapping_attr.present? && user.respond_to?(mapping_attr)
 
@@ -22,10 +32,9 @@ module UserServices
       end
 
       def assign_pennylane_info
-        pennylane = Crm::Pennylane.new
-
         return unless related_quotes.any?
 
+        pennylane = Crm::Pennylane.new
         pl_clients = related_quotes.map { |quote| pennylane.get_client_by_reference(quote.reference) }
 
         raise UpdateInfoError, "Match multiple Pennylane clients, should have only one" if pl_clients.size > 1

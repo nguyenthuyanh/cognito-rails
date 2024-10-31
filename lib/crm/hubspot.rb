@@ -38,7 +38,7 @@ module Crm
 
       # Get files download url, get all files by default
       define_method("get_#{object_name}_files") do |id:, file_attrs: nil|
-        file_attrs ||= ATTR_MAPPING[object_name.to_sym][:files].keys
+        file_attrs ||= ATTR_MAPPING[object_name.to_sym][:files]&.keys || []
 
         object = send("get_#{object_name}", id:, attributes: file_attrs)
 

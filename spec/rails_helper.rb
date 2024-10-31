@@ -79,12 +79,23 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 
   config.before do
-    stub_request(:any, /amazonaws.com/).to_return(body: { message: "message" }.to_json)
-    stub_request(:any,
-      /api.hubapi.com\/crm\/v3\/objects/).to_return(
+    stub_request(:any, /amazonaws.com/).to_return(
+      status: 200,
+      headers: { "Content-Type" => "application/json" },
+      body: { message: "message" }.to_json
+    )
+    stub_request(:any, /api.hubapi.com\/crm\/v3\/objects/).to_return(
+      status: 200,
+      headers: { "Content-Type" => "application/json" },
+      body: { id: "object_id", properties: { foo: "bar" } }.to_json
+    )
+
+    ["customers", "invoices"].each do |object|
+      stub_request(:any, /app.pennylane.com\/api\/external\/v1\/#{object}/).to_return(
         status: 200,
-        headers: {},
-        body: { id: "object_id", properties: { foo: "bar" } }.to_json
+        headers: { "Content-Type" => "application/json" },
+        body: { "total_#{object}" => 1, object => [{ "source_id" => "#{object}_id" }] }.to_json
       )
+    end
   end
 end
