@@ -38,7 +38,7 @@ module Crm
 
       # Get files download url, get all files by default
       define_method("get_#{object_name}_files") do |id:, file_attrs: nil|
-        file_attrs ||= ATTR_MAPPING[object_name.to_sym][:files].keys
+        file_attrs ||= ATTR_MAPPING[object_name.to_sym][:files]&.keys || []
 
         object = send("get_#{object_name}", id:, attributes: file_attrs)
 
@@ -59,6 +59,13 @@ module Crm
 
         send("update_#{object_name}", id:, attributes: { attribute => file.id })
       end
+    end
+
+    def get_quotes_from_contact_id(contact_id)
+      deal_ids = get_contact(id: contact_id, associations: :deal).deal_ids
+
+      quote_ids = deal_ids.map { |deal_id| get_deal(id: deal_id, associations: :quote).quote_ids }.compact.flatten
+      quote_ids.map { |id| get_quote(id:, attributes: [:reference, :download_url]) }
     end
 
     private

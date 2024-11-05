@@ -27,7 +27,7 @@ SimpleCov.start
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
 #
-# Rails.root.glob('spec/support/**/*.rb').sort_by(&:to_s).each { |f| require f }
+Rails.root.glob("spec/support/**/*.rb").sort_by(&:to_s).each { |f| require f }
 
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove these lines.
@@ -36,6 +36,14 @@ begin
 rescue ActiveRecord::PendingMigrationError => e
   abort e.to_s.strip
 end
+
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :rails
+  end
+end
+
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
@@ -71,7 +79,23 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 
   config.before do
-    stub_request(:any, /amazonaws.com/).to_return(body: { message: "message" }.to_json)
-    stub_request(:any, /api.hubapi.com/).to_return(body: { properties: { id: "object_id" } }.to_json)
+    stub_request(:any, /amazonaws.com/).to_return(
+      status: 200,
+      headers: { "Content-Type" => "application/json" },
+      body: { message: "message" }.to_json
+    )
+    stub_request(:any, /api.hubapi.com\/crm\/v3\/objects/).to_return(
+      status: 200,
+      headers: { "Content-Type" => "application/json" },
+      body: { id: "object_id", properties: { foo: "bar" } }.to_json
+    )
+
+    ["customers", "invoices"].each do |object|
+      stub_request(:any, /app.pennylane.com\/api\/external\/v1\/#{object}/).to_return(
+        status: 200,
+        headers: { "Content-Type" => "application/json" },
+        body: { "total_#{object}" => 1, object => [{ "source_id" => "#{object}_id" }] }.to_json
+      )
+    end
   end
 end

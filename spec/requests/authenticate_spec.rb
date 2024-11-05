@@ -15,7 +15,7 @@ end
 
 RSpec.describe "Authenticate user with cognito IDP", type: :request do
   let(:cognito_login_url) { "http://cognito_login_url" }
-  let(:user) { { username: "Test User" } }
+  let(:user) { build(:cognito_user) }
   let(:access_token) { "access_token" }
   let(:refresh_token) { "refresh_token" }
 
@@ -36,11 +36,12 @@ RSpec.describe "Authenticate user with cognito IDP", type: :request do
         allow_any_instance_of(Pognito::Cognito).to receive(:user).and_return(user)
         allow_any_instance_of(Pognito::Cognito).to receive(:access_token).and_return(access_token)
         allow_any_instance_of(Pognito::Cognito).to receive(:refresh_token).and_return(refresh_token)
+        allow_any_instance_of(UserServices::UpdateInfo).to receive(:call).and_return(create(:user))
 
         get "/foo_bar"
         expect(response).to be_successful
         expect(response).not_to have_http_status(:redirect)
-        expect(assigns(:current_user)).to eq(user)
+        expect(assigns(:current_user)).to be_a User
       end
     end
   end

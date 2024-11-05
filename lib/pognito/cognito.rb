@@ -11,9 +11,7 @@ module Pognito
         secret_access_key: Config.client_secret
       )
 
-      @storage ||= storage
-
-      self.new(storage: @storage, client: @client)
+      self.new(storage:, client: @client)
     end
 
     def initialize(storage:, client:)
@@ -40,7 +38,7 @@ module Pognito
 
       user.user_attributes.inject({}) do |h, attr|
         h.merge(attr.name => attr.value)
-      end.merge(username: user.username).symbolize_keys
+      end.merge("username" => user.username)
     end
 
     def store_tokens(access_code)
