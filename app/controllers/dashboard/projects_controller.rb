@@ -8,7 +8,7 @@ module Dashboard
     end
 
     def show
-      contact = hubspot.get_contact_files(id: current_user.hs_contact_id, file_attrs: [:file1, :file2])
+      contact = hubspot.get_contact_files(id: current_user.hs_contact_id, attributes: [:file1, :file2])
       deal = hubspot.get_deal_files(id: params[:id])
 
       quote_ids = hubspot.get_deal(id: params[:id], associations: :quote).quote_ids || []
