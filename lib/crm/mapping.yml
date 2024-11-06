@@ -6,14 +6,18 @@
 #     file1: hubspot_property_1
 #     file2: hubspot_property_2
 
+default_properties: &default_properties
+  id: hs_object_id
+  created_at: createdate
+  updated_at: lastmodifieddate
+
 contact:
   associations:
     - deal
   properties:
+    <<: *default_properties
     email: email
     first_name: firtname
-    created_at: createdate
-    updated_at: lastmodifieddate
   files:
     file1: document_2
     file2: contact_document
@@ -21,11 +25,18 @@ contact:
 deal:
   associations:
     - quote
+  properties:
+    <<: *default_properties
+    name: dealname
+    amount: amount
+    stage: dealstage
   files:
     impot_file: documentfiletest
     mairie_file: mairie_document
     contract_file: contract_document
+
 quote:
   properties:
+    <<: *default_properties
     reference: hs_quote_number
     download_url: hs_pdf_download_link

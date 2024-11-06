@@ -1,3 +1,7 @@
 class ApplicationController < ActionController::Base
-  def index; end
+  include PognitoConcern
+
+  def index
+    redirect_to dashboard_root_path if pognito.tokens?
+  end
 end

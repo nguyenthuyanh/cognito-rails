@@ -13,6 +13,6 @@ Rails.application.routes.draw do
 
     get "/profile", to: "user#index"
 
-    resources :projects, only: [:index, :update]
+    resources :projects, only: [:index, :show, :update]
   end
 end

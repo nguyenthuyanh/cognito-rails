@@ -3,38 +3,12 @@
     Env: <%= ENV["RAILS_ENV"] %>
   </div>
   <div class="content">
-    <h2>Logged as: <%= "#{current_user.first_name} #{current_user.last_name}"  %></h2>
+    <h2>Logged as: <%= "#{current_user.first_name} #{current_user.last_name}" %></h2>
     <ul>
       <li>Email: <%= current_user.email %></li>
       <li>User ID: <%= current_user.uuid %></li>
       <li>Hubspot contact ID: <%= current_user.hs_contact_id %></li>
-      <li>Related quotes:
-        <% quotes.each do |quote| %>
-          <%= link_to quote.reference, quote.download_url, target: :_blank, class: "underline" %>
-        <% end %>
-      </li>
-      <li>Related invoices:
-        <% invoices.each do |invoice| %>
-          <%= link_to invoice[:invoice_number], invoice[:file_url], target: :_blank, class: "underline" %>
-        <% end %>
-      </li>
-      <% [:file1, :file2].each do |attr| %>
-        <li>
-          <%= attr %>:
-          <% contact.send(attr).each do |file| %>
-            <%= link_to file.name, file.url, target: :_blank, class: "underline" %>,
-          <% end %>
-        </li>
-      <% end %>
-
-      <% [:impot_file, :mairie_file, :contract_file].each do |attr| %>
-        <li>
-          <%= attr %>:
-            <% deal.send(attr).each do |file| %>
-              <%= link_to file.name, file.url, target: :_blank, class: "underline" %>,
-                <% end %>
-        </li>
-      <% end %>
+      <li>Pennylane client_id ID: <%= current_user.pl_client_id %></li>
     </ul>
   </div>
   <div>

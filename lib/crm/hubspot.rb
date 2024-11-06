@@ -6,7 +6,7 @@ module Crm
   class Hubspot
     attr_reader :client
 
-    ATTR_MAPPING = YAML.load_file(File.join(__dir__, "mapping.yml")).deep_symbolize_keys
+    ATTR_MAPPING = YAML.load_file(File.join(__dir__, "mapping.yml"), aliases: true).deep_symbolize_keys
     DEFAULT_FOLDER_PATH = "/crm-properties-file-values"
 
     def initialize
@@ -38,9 +38,10 @@ module Crm
 
       # Get files download url, get all files by default
       define_method("get_#{object_name}_files") do |id:, file_attrs: nil|
-        file_attrs ||= ATTR_MAPPING[object_name.to_sym][:files]&.keys || []
+        properties_attrs = file_attrs.blank? ? ATTR_MAPPING[object_name.to_sym][:properties].keys : []
+        file_attrs ||= ATTR_MAPPING[object_name.to_sym][:files].keys || []
 
-        object = send("get_#{object_name}", id:, attributes: file_attrs)
+        object = send("get_#{object_name}", id:, attributes: file_attrs + properties_attrs)
 
         file_attrs.each do |attr|
           next if object.send(attr).blank?
