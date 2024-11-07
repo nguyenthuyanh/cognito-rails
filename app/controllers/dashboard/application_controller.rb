@@ -1,7 +1,5 @@
 module Dashboard
   class ApplicationController < ApplicationController
-    include PognitoConcern
-
     before_action :authenticate_user
 
     def index
