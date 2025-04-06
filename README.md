@@ -1,24 +1,105 @@
-# README
+# 🚀 CognitoRails with AWS Cognito Integration (Dockerized)
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This is a **Ruby on Rails** application integrated with **AWS Cognito** for authentication, fully containerized with **Docker** for easy setup and deployment.
 
-Things you may want to cover:
+## 🔧 Features
 
-* Ruby version
+- 🔐 AWS Cognito authentication (sign up, login, token validation)
+- 🐳 Dockerized development and deployment environment
+- ⚙️ API-ready backend
+- 🔄 JWT-based session handling
+- 🧪 RSpec test suite
 
-* System dependencies
+---
 
-* Configuration
+## 📦 Tech Stack
 
-* Database creation
+- **Ruby on Rails** (v7.1.4)
+- **PostgreSQL** (via Docker service)
+- **AWS Cognito** (SDK: `aws-sdk-cognitoidentityprovider`)
+- **Docker & Docker Compose**
+- **dotenv** for environment variable management
 
-* Database initialization
+---
 
-* How to run the test suite
+## 🐳 Docker Setup
 
-* Services (job queues, cache servers, search engines, etc.)
+### 1. Clone the repository
 
-* Deployment instructions
+```bash
+git clone https://github.com/nguyenthuyanh/cognito-rails
+cd cognito-rails
+```
 
-* ...
+### 2. Create environment files
+
+Create a `.env` file in the root directory with AWS and app settings:
+
+```env
+RAILS_ENV=development
+AWS_REGION=us-east-1
+AWS_COGNITO_REGION=xx
+AWS_ACCESS_KEY=xx
+AWS_COGNITO_DOMAIN=xx
+AWS_COGNITO_APP_CLIENT_ID=xx
+AWS_COGNITO_REDIRECT_URI=xx
+AWS_COGNITO_APP_CLIENT_SECRET=xx
+```
+
+### 3. Build and run the containers
+
+```bash
+docker-compose up --build
+```
+
+The app will be accessible at [http://localhost](http://localhost)
+
+### 4. Run database migrations
+
+In another terminal:
+
+```bash
+docker-compose exec app rails db:create db:migrate
+```
+
+---
+
+## 🧪 Running Tests
+
+```bash
+docker-compose exec app bundle exec rspec
+```
+
+---
+
+## 🔐 Authentication Flow
+
+1. Users authenticate through Cognito.
+2. The app sends credentials to Cognito using the AWS SDK.
+3. Tokens (ID, Access, Refresh) are returned and stored on the client.
+4. Backend verifies token signatures using Cognito’s public JWKs.
+5. Protected endpoints require valid JWTs.
+
+---
+
+## 🗂 Project Structure
+
+```
+.
+├── Dockerfile
+├── docker-compose.yml
+├── app/
+│   └── services/
+│       └── cognito_auth_service.rb
+├── config/
+│   └── initializers/aws.rb
+├── spec/
+└── .env
+```
+
+---
+
+## 📝 License
+
+MIT License. See [LICENSE](LICENSE) for more info.
+
