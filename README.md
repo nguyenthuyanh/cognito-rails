@@ -82,23 +82,6 @@ docker-compose exec app bundle exec rspec
 
 ---
 
-## 🗂 Project Structure
-
-```
-.
-├── Dockerfile
-├── docker-compose.yml
-├── app/
-│   └── services/
-│       └── cognito_auth_service.rb
-├── config/
-│   └── initializers/aws.rb
-├── spec/
-└── .env
-```
-
----
-
 ## 📝 License
 
 MIT License. See [LICENSE](LICENSE) for more info.
